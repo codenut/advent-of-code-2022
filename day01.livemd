@@ -1,0 +1,54 @@
+# day01
+
+## Advent of Code 2022 - Day 1
+
+[Calorie counting](https://adventofcode.com/2022/day/1)
+
+## Read the elves' calorie items
+
+Each elve's group of calorie items are separated by a new line. Therefore, we ca use the double `\n` as separtor to split the input data.
+
+```elixir
+defmodule Input do
+  def to_ints(line) do
+    line
+    |> String.split("\n", trim: true)
+    |> Enum.map(&String.to_integer/1)
+  end
+
+  def read do
+    File.read!("inputs/day01.in")
+    |> String.split("\n\n", trim: true)
+    |> Enum.map(&Input.to_ints/1)
+  end
+end
+```
+
+Then, convert each calorie item into an int and get the sum of each elve's calorie items.
+
+```elixir
+defmodule Part1 do
+  def get_max() do
+    Input.read()
+    |> Enum.map(&Enum.sum/1)
+    |> Enum.max()
+  end
+end
+
+Part1.get_max()
+```
+
+```elixir
+defmodule Part2 do
+  def get_top(n) do
+    Input.read()
+    |> Enum.map(&Enum.sum/1)
+    |> Enum.sort()
+    |> Enum.reverse()
+    |> Enum.slice(0, n)
+    |> Enum.sum()
+  end
+end
+
+Part2.get_top(3)
+```
