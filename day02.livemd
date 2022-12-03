@@ -1,0 +1,93 @@
+# day02
+
+## Advent of Code 2022 - Day 2
+
+[rock paper scissors](https://adventofcode.com/2022/day/2)
+
+## Read the input
+
+We replace the alpha characters with numeric ones
+
+* Rock -> 0
+* Paper -> 1
+* Scissors -> 2
+
+This will make it easier to determine who wins the round. We start from 0 to make modulo arithmetic easier. We will use modulo arithmetic to determine the outcome of each round.
+
+```elixir
+defmodule Input do
+  def read do
+    File.read!("/Users/michael/olympiad/aoc/2022/inputs/day02.in")
+    |> String.replace(~r/[AX]/, "0")
+    |> String.replace(~r/[BY]/, "1")
+    |> String.replace(~r/[CZ]/, "2")
+    |> String.split("\n", trim: true)
+    |> Enum.map(fn line ->
+      String.split(line)
+      |> Enum.map(&String.to_integer/1)
+    end)
+  end
+end
+```
+
+```elixir
+defmodule Outcome do
+  def lose_against(hand) do
+    rem(hand - 1 + 3, 3)
+  end
+
+  def win_against(hand) do
+    rem(hand + 1, 3)
+  end
+
+  def draw_against(hand) do
+    hand
+  end
+end
+
+defmodule Part1 do
+  def get_score(opp, me) do
+    me + 1 +
+      cond do
+        opp == Outcome.lose_against(me) -> 6
+        me == opp -> 3
+        true -> 0
+      end
+  end
+
+  def total_score do
+    Input.read()
+    |> Enum.map(fn round ->
+      [opp, me] = round
+      get_score(opp, me)
+    end)
+    |> Enum.sum()
+  end
+end
+
+Part1.total_score()
+```
+
+```elixir
+defmodule Part2 do
+  def get_score(opp, me) do
+    1 +
+      cond do
+        me == 0 -> Outcome.lose_against(opp)
+        me == 1 -> Outcome.draw_against(opp) + 3
+        me == 2 -> Outcome.win_against(opp) + 6
+      end
+  end
+
+  def total_score do
+    Input.read()
+    |> Enum.map(fn round ->
+      [opp, me] = round
+      get_score(opp, me)
+    end)
+    |> Enum.sum()
+  end
+end
+
+Part2.total_score()
+```
