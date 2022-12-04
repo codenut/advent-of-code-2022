@@ -1,0 +1,67 @@
+# day04
+
+## Advent of Code 2022 - Day 4
+
+[camp cleanup](https://adventofcode.com/2022/day/4)
+
+```elixir
+defmodule Input do
+  def to_int(section) do
+    String.split(section, "-")
+    |> Enum.map(&String.to_integer/1)
+  end
+
+  def sections_to_int(sections) do
+    Enum.map(sections, fn section -> Input.to_int(section) end)
+    |> Enum.map(&List.to_tuple/1)
+  end
+
+  def read do
+    File.read!("/Users/michael/olympiad/aoc/2022/inputs/day04.in")
+    |> String.split("\n", trim: true)
+    |> Enum.map(fn line -> String.split(line, ",") end)
+    |> Enum.map(&Input.sections_to_int/1)
+    |> Enum.map(&Enum.sort/1)
+  end
+end
+
+Input.read()
+```
+
+```elixir
+defmodule Part1 do
+  def overlaps(range) do
+    [{a1, b1}, {a2, b2}] = range
+    a1 <= a2 && b2 <= b1
+  end
+
+  def is_fully_contains(ranges) do
+    [range1, range2] = ranges
+    Part1.overlaps([range1, range2]) || Part1.overlaps([range2, range1])
+  end
+
+  def overlap_count do
+    Input.read()
+    |> Enum.count(&Part1.is_fully_contains/1)
+  end
+end
+
+Part1.overlap_count()
+```
+
+```elixir
+defmodule Part2 do
+  def overlaps(ranges) do
+    [{a1, b1}, {a2, b2}] = ranges
+    {a, b} = {max(a1, a2), min(b1, b2)}
+    a <= b
+  end
+
+  def overlap_count do
+    Input.read()
+    |> Enum.count(&Part2.overlaps/1)
+  end
+end
+
+Part2.overlap_count()
+```
