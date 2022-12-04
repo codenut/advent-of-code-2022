@@ -1,0 +1,67 @@
+# Advent of Code 2022 - Day 3
+
+## Advent of Code - Day 3
+
+[rucksack reorganization](https://adventofcode.com/2022/day/3)
+
+```elixir
+defmodule Input do
+  def read do
+    File.read!("/Users/michael/olympiad/aoc/2022/inputs/day03.in")
+    |> String.split("\n", trim: true)
+    |> Enum.map(&to_charlist/1)
+  end
+end
+```
+
+```elixir
+defmodule Part1 do
+  def to_int(type) do
+    if 65 <= type and type <= 90 do
+      type - 65 + 27
+    else
+      type - 97 + 1
+    end
+  end
+
+  def common(a, b) do
+    diff = a -- b
+    a -- diff
+  end
+
+  def get_common(rucksack) do
+    len = length(rucksack)
+    [comp1, comp2] = Enum.chunk_every(rucksack, div(len, 2))
+    Enum.at(common(comp1, comp2), 0)
+  end
+
+  def total_priorities do
+    Input.read()
+    |> Enum.map(&Part1.get_common/1)
+    |> Enum.map(&Part1.to_int/1)
+    |> Enum.sum()
+  end
+end
+
+Part1.total_priorities()
+```
+
+```elixir
+defmodule Part2 do
+  def get_common(g) do
+    [a, b, c] = g
+    d = Part1.common(a, b)
+    Enum.at(Part1.common(c, d), 0)
+  end
+
+  def total_priorities do
+    Input.read()
+    |> Enum.chunk_every(3)
+    |> Enum.map(&Part2.get_common/1)
+    |> Enum.map(&Part1.to_int/1)
+    |> Enum.sum()
+  end
+end
+
+Part2.total_priorities()
+```
