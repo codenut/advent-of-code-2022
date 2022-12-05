@@ -1,0 +1,117 @@
+# day05
+
+## Advent of Code 2022 - Day 5
+
+[supply stacks](https://adventofcode.com/2022/day/5)
+
+```elixir
+defmodule Input do
+  def read_file do
+    File.read!("/Users/michael/olympiad/aoc/2022/inputs/day05.in")
+    |> String.split("\n\n", trim: true)
+  end
+
+  def each_stack(raw_stack, idx) do
+    raw_stack
+    |> Enum.map(&String.graphemes/1)
+    |> Enum.map(fn el -> Enum.at(el, idx) end)
+    |> Enum.filter(&Input.is_not_empty/1)
+  end
+
+  def is_not_empty(s) do
+    String.length(String.trim(s)) > 0
+  end
+
+  def make_stack(raw_stack) do
+    raw_stack = String.split(raw_stack, "\n")
+    len = length(raw_stack)
+    nums = List.last(raw_stack)
+    raw_stack = Enum.slice(raw_stack, 0, len - 1)
+
+    nums
+    |> String.graphemes()
+    |> Enum.with_index()
+    |> Enum.filter(fn {e, _} -> e != " " end)
+    |> Enum.map(fn {_, i} -> i end)
+    |> Enum.map(fn i ->
+      each_stack(raw_stack, i)
+    end)
+  end
+
+  def to_int(move) do
+    String.split(move, " ")
+    |> Enum.map(&String.to_integer/1)
+  end
+
+  def make_moves(moves) do
+    String.split(moves, "\n")
+    |> Enum.map(fn move -> String.replace(move, "move ", "") end)
+    |> Enum.map(fn move -> String.replace(move, "from ", "") end)
+    |> Enum.map(fn move -> String.replace(move, "to ", "") end)
+    |> Enum.filter(fn move -> move != "" end)
+    |> Enum.map(&Input.to_int/1)
+  end
+
+  def stack_and_moves do
+    [raw_stack, moves] = Input.read_file()
+    {make_stack(raw_stack), make_moves(moves)}
+  end
+end
+
+Input.stack_and_moves()
+```
+
+```elixir
+defmodule Part1 do
+  def set_stack(stacks, idx, val) do
+    Enum.with_index(stacks)
+    |> Enum.map(fn {el, i} ->
+      if i == idx do
+        val
+      else
+        el
+      end
+    end)
+  end
+
+  def rearrange([head | tail], stacks, is_rev) do
+    [size, from, to] = head
+
+    orig =
+      if is_rev do
+        Enum.slice(Enum.at(stacks, from - 1), 0, size)
+        |> Enum.reverse()
+      else
+        Enum.slice(Enum.at(stacks, from - 1), 0, size)
+      end
+
+    dest = orig ++ Enum.at(stacks, to - 1)
+    stacks = Part1.set_stack(stacks, to - 1, dest)
+
+    orig = Enum.slice(Enum.at(stacks, from - 1), size, length(Enum.at(stacks, from - 1)))
+    stacks = Part1.set_stack(stacks, from - 1, orig)
+
+    rearrange(tail, stacks, is_rev)
+  end
+
+  def rearrange([], stacks, _) do
+    stacks
+  end
+
+  def rearrange(is_rev) do
+    {stacks, moves} = Input.stack_and_moves()
+
+    ans =
+      Part1.rearrange(moves, stacks, is_rev)
+      |> Enum.map(fn stack -> List.first(stack) end)
+
+    Enum.join(ans, "")
+  end
+end
+
+Part1.rearrange(true)
+```
+
+```elixir
+Part1.rearrange(false)
+```
