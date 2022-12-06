@@ -1,0 +1,54 @@
+# day06
+
+## Advent of Code 2022 - Day 5
+
+[tuning trouble](https://adventofcode.com/2022/day/6)
+
+```elixir
+defmodule Input do
+  def read do
+    File.read!("/Users/michael/olympiad/aoc/2022/inputs/day06.in")
+  end
+end
+```
+
+```elixir
+defmodule Part1 do
+  def get_packet(s, from, len) do
+    t = String.slice(s, from..(from + len - 1))
+
+    if String.length(t) == len do
+      tl =
+        t
+        |> to_charlist()
+        |> Enum.sort()
+
+      tl
+      |> Enum.with_index()
+      |> Enum.filter(fn {_, i} -> i > 0 end)
+      |> Enum.all?(fn {_, i} -> Enum.at(tl, i - 1) != Enum.at(tl, i) end)
+    end
+  end
+
+  def get_start_marker(len) do
+    s = Input.read()
+
+    {_, i} =
+      s
+      |> to_charlist()
+      |> Enum.with_index()
+      |> Enum.map(fn {_, i} ->
+        {Part1.get_packet(s, i, len), i}
+      end)
+      |> Enum.find(fn {b, _} -> b end)
+
+    i + len
+  end
+end
+
+Part1.get_start_marker(4)
+```
+
+```elixir
+Part1.get_start_marker(14)
+```
